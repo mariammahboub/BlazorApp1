@@ -1,0 +1,130 @@
+﻿@page "/CreateDelivery"
+@using Core.Models
+@using Service
+@inject DeliveryService DeliveryService
+@inject StoreService StoreService
+@inject MerchantService MerchantService
+@inject CustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New Delivery</h3>
+
+<EditForm Model="delivery" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="storeId">Store</label>
+        <InputSelect id="storeId" class="form-control" @bind-Value="delivery.StoreId">
+            <option value="">Select a store</option>
+            @foreach (var store in stores)
+            {
+                <option value="@store.StoreId">@store.StoreName</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="merchantId">Merchant</label>
+        <InputSelect id="merchantId" class="form-control" @bind-Value="delivery.MerchantId">
+            <option value="">Select a merchant</option>
+            @foreach (var merchant in merchants)
+            {
+                <option value="@merchant.MerchantId">@merchant.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+
+    <div class="form-group">
+        <label for="customerId">Customer</label>
+        <InputSelect id="customerId" class="form-control" @bind-Value="delivery.CustomerId">
+            <option value="">Select a customer</option>
+            @foreach (var customer in customers)
+            {
+                <option value="@customer.CustomerId">@customer.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="numberOfCartons">Number of Cartons</label>
+        <InputNumber id="numberOfCartons" class="form-control" @bind-Value="delivery.NumberOfCartons" />
+    </div>
+
+    <div class="form-group">
+        <label for="goodsType">Goods Type</label>
+        <InputSelect id="goodsType" class="form-control" @bind-Value="delivery.GoodsType">
+            @foreach (GoodsType type in Enum.GetValues(typeof(GoodsType)))
+            {
+                <option value="@type">@type</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="notes">Notes</label>
+        <InputText id="notes" class="form-control" @bind-Value="delivery.Notes" />
+    </div>
+
+    <div class="form-group">
+        <label for="shipPrice">Ship Price</label>
+        <InputNumber id="shipPrice" class="form-control" @bind-Value="delivery.ShipPrice" />
+    </div>
+
+    <div class="form-group">
+        <label for="volume">Volume</label>
+        <InputNumber id="volume" class="form-control" @bind-Value="delivery.Volume" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Delivery</button>
+</EditForm>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private Delivery delivery = new Delivery();
+    private List<Store> stores = new List<Store>();
+    private List<Merchant> merchants = new List<Merchant>();
+    private List<Customer> customers = new List<Customer>();
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stores = await StoreService.GetStoresAsync();
+        merchants = await MerchantService.GetMerchantsAsync();
+        customers = await CustomerService.GetCustomersAsync();
+    }
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            if (delivery.GoodsPricing == null)
+            {
+                delivery.GoodsPricing = new GoodsPrice
+                    {
+                        DefaultPricePerCubicMeter = delivery.ShipPrice, 
+                        TotalPrice = 0,
+                        Type = delivery.GoodsType
+                    };
+            }
+
+            await DeliveryService.AddDeliveryAsync(delivery);
+            NavigationManager.NavigateTo("/AllDeliveries");
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unexpected error: {ex.Message}";
+        }
+    }
+
+
+}

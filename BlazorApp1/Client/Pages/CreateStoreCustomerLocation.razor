@@ -1,0 +1,87 @@
+﻿@page "/CreateStoreCustomerLocation"
+@using System.Text.Json
+@inject StoreCustomerLocationService StoreCustomerLocationService
+@inject StoreService StoreService
+@inject CustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New StoreCustomerLocation</h3>
+
+<EditForm Model="storeCustomerLocation" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="storeId">Store</label>
+        <InputSelect id="storeId" class="form-control" @bind-Value="storeCustomerLocation.StoreId">
+            <option value="">Select a store</option>
+            @foreach (var store in stores)
+            {
+                <option value="@store.StoreId">@store.StoreName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="customerId">Customer</label>
+        <InputSelect id="customerId" class="form-control" @bind-Value="storeCustomerLocation.CustomerId">
+            <option value="">Select a customer</option>
+            @foreach (var customer in customers)
+            {
+                <option value="@customer.CustomerId">@customer.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="numberOfCartons">Number of Cartons</label>
+        <InputNumber id="numberOfCartons" class="form-control" @bind-Value="storeCustomerLocation.NumberOfCartons" />
+    </div>
+
+    <div class="form-group">
+        <label for="goodsDeliveryIds">Goods Delivery IDs (comma-separated)</label>
+        <InputText id="goodsDeliveryIds" class="form-control" @bind-Value="goodsDeliveryIdsInput" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create StoreCustomerLocation</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            <h4>An error occurred:</h4>
+            <p>@errorMessage</p>
+        </div>
+    }
+</EditForm>
+
+@code {
+    private StoreCustomerLocation storeCustomerLocation = new StoreCustomerLocation();
+    private List<Store> stores = new List<Store>();
+    private List<Customer> customers = new List<Customer>();
+    private string goodsDeliveryIdsInput = string.Empty;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stores = await StoreService.GetStoresAsync();
+        customers = await CustomerService.GetCustomersAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Convert the comma-separated input string to a list of integers
+        storeCustomerLocation.GoodsDeliveryIds = goodsDeliveryIdsInput.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                                      .Select(int.Parse)
+                                                                      .ToList();
+
+        try
+        {
+            await StoreCustomerLocationService.AddStoreCustomerLocationAsync(storeCustomerLocation);
+            NavigationManager.NavigateTo("/GetAllStoreCustomerLocations");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while adding the store customer location: {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,33 @@
+﻿@page "/Allstores"
+@inject StoreService StoreService
+
+<PageTitle>All Stores</PageTitle>
+
+<h3>All Stores</h3>
+
+@if (stores == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (stores.Count == 0)
+{
+    <p>No stores available.</p>
+}
+else
+{
+    <ul>
+        @foreach (var store in stores)
+        {
+            <li>@store.StoreName - @store.Type - @store.Country</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Store> stores;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stores = await StoreService.GetStoresAsync();
+    }
+}

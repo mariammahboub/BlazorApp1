@@ -1,0 +1,48 @@
+﻿@page "/AllApplicationsOrMuamalahs"
+@using Core.Models
+@using Service
+@inject ApplicationOrMuamalahService ApplicationOrMuamalahService
+
+<h3>All Applications or Muamalahs</h3>
+
+@if (applications == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (applications.Count == 0)
+{
+    <p>No applications or muamalahs found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Application ID</th>
+                <th>Customer ID</th>
+                <th>Type</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in applications)
+            {
+                <tr>
+                    <td>@app.ApplicationId</td>
+                    <td>@app.CustomerId</td>
+                    <td>@app.Type</td>
+                    <td>@app.Cost</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ApplicationOrMuamalah> applications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        applications = await ApplicationOrMuamalahService.GetAllApplicationsOrMuamalahsAsync();
+    }
+}

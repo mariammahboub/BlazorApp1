@@ -1,0 +1,41 @@
+﻿@page "/customer/{customerId:int}"
+
+@inject CustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+<h3>Customer Details</h3>
+
+@if (customer == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@customer.Name</h5>
+            <p class="card-text"><strong>Address:</strong> @customer.Address</p>
+            <p class="card-text"><strong>Telephone Numbers:</strong> @string.Join(", ", customer.TelephoneNumbers)</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-secondary" @onclick="GoBack">Back</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int customerId { get; set; }
+
+    private Customer customer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await CustomerService.GetCustomerByIdAsync(customerId);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/CustomerList");
+    }
+}

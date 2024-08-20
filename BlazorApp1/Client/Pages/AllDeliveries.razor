@@ -1,0 +1,69 @@
+﻿@page "/AllDeliveries"
+@using Core.Models
+@using Service
+@inject DeliveryService DeliveryService
+
+<h3>All Deliveries</h3>
+
+@if (deliveries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (deliveries.Count == 0)
+{
+    <p>No deliveries found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Delivery ID</th>
+                <th>Store ID</th>
+                <th>Merchant ID</th>
+                <th>Customer ID</th>
+                <th>Number of Cartons</th>
+                <th>Goods Type</th>
+                <th>Notes</th>
+                <th>Ship Price</th>
+                <th>Volume</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var delivery in deliveries)
+            {
+                <tr>
+                    <td>@delivery.DeliveryId</td>
+                    <td>@delivery.StoreId</td>
+                    <td>@delivery.MerchantId</td>
+                    <td>@delivery.CustomerId</td>
+                    <td>@delivery.NumberOfCartons</td>
+                    <td>@delivery.GoodsType</td>
+                    <td>@delivery.Notes</td>
+                    <td>@delivery.ShipPrice</td>
+                    <td>@delivery.Volume</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Delivery> deliveries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            deliveries = await DeliveryService.GetDeliveriesAsync();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+        }
+    }
+}

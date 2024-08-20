@@ -1,0 +1,66 @@
+﻿@page "/"
+
+<PageTitle>Welcome</PageTitle>
+
+<style>
+    .index-container {
+        text-align: center;
+        margin-top: 50px;
+        color: #333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .welcome-message {
+        font-size: 2.8em;
+        margin-bottom: 15px;
+        color: #007ACC;
+    }
+
+    .welcome-description {
+        font-size: 1.3em;
+        margin-bottom: 30px;
+        color: #555;
+    }
+
+    .image-container img {
+        max-width: 350px;
+        margin: 20px 0;
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-container {
+        margin-top: 25px;
+    }
+
+    .survey-button {
+        background-color: #007ACC;
+        color: white;
+        padding: 12px 24px;
+        font-size: 1.1em;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .survey-button:hover {
+        background-color: #005A9E;
+    }
+</style>
+
+<div class="index-container">
+    <h1 class="welcome-message">🌟 Welcome to Your Blazor Journey!</h1>
+    <p class="welcome-description">
+        Discover the power of modern web development with Blazor. We’re thrilled to have you here!
+    </p>
+    <div class="button-container">
+        <button @onclick="ShowSurvey" class="survey-button">💬 Share Your Experience</button>
+    </div>
+</div>
+
+@code {
+    private void ShowSurvey()
+    {
+    }
+}

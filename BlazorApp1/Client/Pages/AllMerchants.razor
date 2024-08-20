@@ -1,0 +1,44 @@
+﻿@page "/AllMerchants"
+@using Core.Models
+@using Service
+@inject MerchantService MerchantService
+
+<h3>All Merchants</h3>
+
+@if (merchants == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (merchants.Count == 0)
+{
+    <p>No merchants found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var merchant in merchants)
+            {
+                <tr>
+                    <td>@merchant.MerchantId</td>
+                    <td>@merchant.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Merchant> merchants;
+
+    protected override async Task OnInitializedAsync()
+    {
+        merchants = await MerchantService.GetMerchantsAsync();
+    }
+}

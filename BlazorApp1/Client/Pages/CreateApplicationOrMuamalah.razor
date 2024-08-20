@@ -1,0 +1,84 @@
+﻿@page "/CreateApplicationOrMuamalah"
+@using Core.Models
+@using Service
+@inject CustomerService CustomerService
+@inject ApplicationOrMuamalahService ApplicationOrMuamalahService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New Application or Muamalah</h3>
+
+<EditForm Model="applicationOrMuamalah" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="customerId">Customer</label>
+        <InputSelect id="customerId" class="form-control" @bind-Value="applicationOrMuamalah.CustomerId">
+            <option value="">Select a customer</option>
+            @foreach (var customer in customers)
+            {
+                <option value="@customer.CustomerId">@customer.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="type">Application Type</label>
+        <InputSelect id="type" class="form-control" @bind-Value="applicationOrMuamalah.Type">
+            @foreach (var type in Enum.GetValues<ApplicationType>())
+            {
+                <option value="@type">@type</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="cost">Cost</label>
+        <InputNumber id="cost" class="form-control" @bind-Value="applicationOrMuamalah.Cost" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Application</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private ApplicationOrMuamalah applicationOrMuamalah = new ApplicationOrMuamalah();
+    private List<Customer> customers = new List<Customer>();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            customers = await CustomerService.GetCustomersAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load customers: {ex.Message}";
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await ApplicationOrMuamalahService.AddApplicationOrMuamalahAsync(applicationOrMuamalah);
+            NavigationManager.NavigateTo("/AllApplicationsOrMuamalahs");
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"Request error: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unexpected error: {ex.Message}";
+        }
+    }
+
+}

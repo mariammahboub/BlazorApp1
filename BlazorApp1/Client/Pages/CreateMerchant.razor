@@ -1,0 +1,48 @@
+﻿@page "/CreateMerchant"
+@using Core.Models
+@using Service
+@inject MerchantService MerchantService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New Merchant</h3>
+
+<EditForm Model="merchant" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="merchant.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Merchant</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private Merchant merchant = new Merchant();
+    private string errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await MerchantService.AddMerchantAsync(merchant);
+            NavigationManager.NavigateTo("/AllMerchants");
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unexpected error: {ex.Message}";
+        }
+    }
+}

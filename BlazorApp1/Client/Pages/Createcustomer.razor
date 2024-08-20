@@ -1,0 +1,46 @@
+﻿@page "/Createcustomer"
+
+@inject CustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New Customer</h3>
+
+<EditForm Model="newCustomer" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" class="form-control" @bind-Value="newCustomer.Name" />
+    </div>
+
+    <div class="form-group">
+        <label for="address">Address:</label>
+        <InputText id="address" class="form-control" @bind-Value="newCustomer.Address" />
+    </div>
+
+    <div class="form-group">
+        <label for="telephoneNumbers">Telephone Numbers:</label>
+        <InputText id="telephoneNumbers" class="form-control" @bind-Value="telephoneNumbers" />
+        <small class="form-text text-muted">Separate multiple numbers with commas.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Customer</button>
+</EditForm>
+
+@code {
+    private Customer newCustomer = new Customer();
+    private string telephoneNumbers;
+
+    private async Task HandleValidSubmit()
+    {
+        // Split the telephoneNumbers string by commas and assign to the TelephoneNumbers list
+        newCustomer.TelephoneNumbers = telephoneNumbers?.Split(',').ToList();
+
+        // Call the service to add the customer
+        await CustomerService.AddCustomerAsync(newCustomer);
+
+        // Navigate back to the list of customers or another page
+        NavigationManager.NavigateTo("/CustomerList");
+    }
+}

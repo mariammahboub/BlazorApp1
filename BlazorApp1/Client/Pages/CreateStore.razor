@@ -1,0 +1,55 @@
+﻿@page "/CreateStore"
+@inject StoreService StoreService
+@inject NavigationManager NavigationManager
+
+<h3>Create a New Store</h3>
+
+<EditForm Model="store" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="storeName">Store Name</label>
+        <InputText id="storeName" class="form-control" @bind-Value="store.StoreName" />
+        <ValidationMessage For="@(() => store.StoreName)" />
+    </div>
+
+    <div class="form-group">
+        <label for="type">Type</label>
+        <InputText id="type" class="form-control" @bind-Value="store.Type" />
+        <ValidationMessage For="@(() => store.Type)" />
+    </div>
+
+    <div class="form-group">
+        <label for="country">Country</label>
+        <InputText id="country" class="form-control" @bind-Value="store.Country" />
+        <ValidationMessage For="@(() => store.Country)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Store</button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            @errorMessage
+        </div>
+    }
+</EditForm>
+
+@code {
+    private Store store = new Store();
+    private string errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await StoreService.AddStoreAsync(store);
+            NavigationManager.NavigateTo("/AllStores");
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"An error occurred while creating the store: {ex.Message}";
+        }
+    }
+}
